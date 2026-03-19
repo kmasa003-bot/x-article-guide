@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>X記事作成手順 第6回：補足・なぜ見出しをつけるか</title>
+  <style>
+    /* ===== リセット & ベース ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: #0f0f13;
+      color: #e8e8f0;
+      line-height: 1.7;
+    }
+
+    /* ===== ヘッダー ===== */
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      padding: 60px 24px 50px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(29,161,242,0.18) 0%, transparent 70%);
+    }
+    .header-series {
+      display: inline-block;
+      background: rgba(29,161,242,0.2);
+      border: 1px solid rgba(29,161,242,0.5);
+      color: #1da1f2;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      padding: 4px 16px;
+      border-radius: 20px;
+      margin-bottom: 18px;
+      position: relative;
+    }
+    .bonus-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #9f7aea, #805ad5);
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 900;
+      padding: 3px 12px;
+      border-radius: 20px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1.3;
+      position: relative;
+    }
+    header h1 span { color: #1da1f2; }
+    header p.subtitle {
+      margin-top: 14px;
+      color: #a0aec0;
+      font-size: 0.95rem;
+      position: relative;
+    }
+    .header-tags {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+      position: relative;
+    }
+    .tag {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #cbd5e0;
+      font-size: 0.78rem;
+      padding: 4px 14px;
+      border-radius: 20px;
+    }
+
+    /* ===== 補足バナー ===== */
+    .bonus-banner {
+      max-width: 760px;
+      margin: 32px auto 0;
+      padding: 0 20px;
+    }
+    .bonus-inner {
+      background: linear-gradient(135deg, rgba(159,122,234,0.12), rgba(128,90,213,0.08));
+      border: 1px solid rgba(159,122,234,0.4);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: #d6bcfa;
+    }
+    .bonus-inner span.bi-icon { font-size: 1.3rem; flex-shrink: 0; }
+
+    /* ===== 目次 ===== */
+    .toc-wrapper {
+      max-width: 760px;
+      margin: 24px auto 0;
+      padding: 0 20px;
+    }
+    .toc {
+      background: #1a1a2e;
+      border: 1px solid rgba(29,161,242,0.25);
+      border-radius: 16px;
+      padding: 28px 32px;
+    }
+    .toc h2 {
+      font-size: 1rem;
+      color: #1da1f2;
+      margin-bottom: 16px;
+      letter-spacing: 0.06em;
+    }
+    .toc ol { list-style: none; counter-reset: toc-counter; }
+    .toc ol li {
+      counter-increment: toc-counter;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .toc ol li:last-child { border-bottom: none; }
+    .toc ol li a {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+    .toc ol li a:hover { color: #1da1f2; }
+    .toc ol li a::before {
+      content: counter(toc-counter, decimal-leading-zero);
+      color: #1da1f2;
+      font-size: 0.75rem;
+      font-weight: 700;
+      min-width: 24px;
+    }
+    .toc-ts {
+      margin-left: auto;
+      font-size: 0.72rem;
+      color: #718096;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ===== メインコンテンツ ===== */
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    /* ===== セクション共通 ===== */
+    .section { margin-bottom: 56px; }
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .section-num {
+      background: linear-gradient(135deg, #1da1f2, #0d8ecf);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 900;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .section-title-block h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+    .timestamp {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(29,161,242,0.12);
+      border: 1px solid rgba(29,161,242,0.3);
+      color: #1da1f2;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 20px;
+      margin-top: 5px;
+      font-variant-numeric: tabular-nums;
+    }
+    .timestamp::before { content: '▶'; font-size: 0.6rem; }
+
+    /* ===== 説明テキスト ===== */
+    .desc {
+      color: #a0aec0;
+      font-size: 0.9rem;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    /* ===== 汎用カード ===== */
+    .card {
+      background: #1a1a2e;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    /* ===== 区切り線 ===== */
+    .divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 48px 0; }
+
+    /* ===== 看板アナロジー図 ===== */
+    .signboard-diagram {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 16px;
+      align-items: center;
+      margin-top: 16px;
+    }
+    .sb-box {
+      background: #1e2035;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 20px 16px;
+      text-align: center;
+    }
+    .sb-box.title-box {
+      background: rgba(29,161,242,0.08);
+      border-color: rgba(29,161,242,0.35);
+    }
+    .sb-box.heading-box {
+      background: rgba(104,211,145,0.06);
+      border-color: rgba(104,211,145,0.3);
+    }
+    .sb-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+    .sb-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+    .sb-label.blue { color: #1da1f2; }
+    .sb-label.green { color: #68d391; }
+    .sb-name { font-size: 0.95rem; font-weight: 800; color: #e2e8f0; margin-bottom: 6px; }
+    .sb-desc { font-size: 0.78rem; color: #718096; line-height: 1.5; }
+    .sb-example {
+      margin-top: 10px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.75rem;
+      color: #a0aec0;
+      text-align: left;
+    }
+    .sb-arrow { text-align: center; color: #4a5568; font-size: 1.2rem; }
+
+    /* ===== 記事構造ビジュアル ===== */
+    .article-structure {
+      background: #1e2035;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+    .as-label { font-size: 0.72rem; color: #718096; margin-bottom: 14px; text-align: center; }
+    .as-title {
+      background: rgba(29,161,242,0.12);
+      border: 1px solid rgba(29,161,242,0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #90cdf4;
+      margin-bottom: 10px;
+    }
+    .as-title-label { font-size: 0.65rem; color: #1da1f2; font-weight: 700; margin-bottom: 3px; }
+    .as-heading {
+      background: rgba(104,211,145,0.08);
+      border: 1px solid rgba(104,211,145,0.25);
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #9ae6b4;
+      margin-bottom: 6px;
+      margin-left: 12px;
+    }
+    .as-heading-label { font-size: 0.62rem; color: #68d391; font-weight: 700; margin-bottom: 2px; }
+    .as-subheading {
+      background: rgba(246,173,85,0.06);
+      border: 1px solid rgba(246,173,85,0.2);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      color: #f6e05e;
+      margin-bottom: 4px;
+      margin-left: 28px;
+    }
+    .as-subheading-label { font-size: 0.6rem; color: #f6ad55; font-weight: 700; margin-bottom: 2px; }
+    .as-body {
+      background: rgba(255,255,255,0.03);
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 0.75rem;
+      color: #718096;
+      margin-bottom: 4px;
+      margin-left: 28px;
+    }
+
+    /* ===== 理由カード ===== */
+    .reason-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .reason-card {
+      background: #1e2035;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 22px 18px;
+      position: relative;
+    }
+    .reason-card.r1 {
+      background: rgba(29,161,242,0.06);
+      border-color: rgba(29,161,242,0.3);
+    }
+    .reason-card.r2 {
+      background: rgba(104,211,145,0.06);
+      border-color: rgba(104,211,145,0.3);
+    }
+    .rc-num {
+      font-size: 0.65rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    .rc-num.blue { color: #1da1f2; }
+    .rc-num.green { color: #68d391; }
+    .rc-icon { font-size: 1.8rem; display: block; margin-bottom: 10px; }
+    .rc-title { font-size: 1rem; font-weight: 800; color: #e2e8f0; margin-bottom: 8px; }
+    .rc-desc { font-size: 0.8rem; color: #718096; line-height: 1.6; }
+    .rc-merit {
+      margin-top: 12px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .rc-merit-item {
+      font-size: 0.75rem;
+      color: #a0aec0;
+      padding: 3px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .rc-merit-item::before { content: '✓'; color: #68d391; font-weight: 700; flex-shrink: 0; }
+
+    /* ===== SEO解説図 ===== */
+    .seo-diagram {
+      background: #1e2035;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+    .seo-flow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .seo-box {
+      background: #0f0f13;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 12px 16px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #a0aec0;
+      min-width: 120px;
+    }
+    .seo-box.highlight {
+      background: rgba(104,211,145,0.08);
+      border-color: rgba(104,211,145,0.35);
+      color: #9ae6b4;
+      font-weight: 700;
+    }
+    .seo-arrow { color: #4a5568; font-size: 1rem; flex-shrink: 0; }
+    .seo-note {
+      font-size: 0.75rem;
+      color: #718096;
+      line-height: 1.7;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 14px;
+    }
+
+    /* ===== 見出し設定の実演図 ===== */
+    .demo-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 16px;
+    }
+    .ds-step {
+      display: flex;
+      gap: 16px;
+      position: relative;
+    }
+    .ds-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 40px;
+      bottom: -12px;
+      width: 2px;
+      background: rgba(29,161,242,0.25);
+    }
+    .ds-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1da1f2, #0d8ecf);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 900;
+      color: white;
+      flex-shrink: 0;
+    }
+    .ds-content {
+      background: #1e2035;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 14px 16px;
+      flex: 1;
+      margin-bottom: 12px;
+    }
+    .ds-content h3 { font-size: 0.9rem; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+    .ds-content p  { font-size: 0.8rem; color: #718096; line-height: 1.6; }
+
+    /* ===== 見出し階層ビジュアル ===== */
+    .heading-hierarchy {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 16px;
+    }
+    .hh-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-radius: 10px;
+      padding: 12px 16px;
+    }
+    .hh-item.h1 {
+      background: rgba(29,161,242,0.1);
+      border: 1px solid rgba(29,161,242,0.35);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .hh-item.h2 {
+      background: rgba(104,211,145,0.07);
+      border: 1px solid rgba(104,211,145,0.25);
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-left: 20px;
+    }
+    .hh-item.h3 {
+      background: rgba(246,173,85,0.06);
+      border: 1px solid rgba(246,173,85,0.2);
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-left: 40px;
+    }
+    .hh-label {
+      font-size: 0.65rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      padding: 2px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .hh-label.blue  { background: rgba(29,161,242,0.2);  color: #1da1f2; }
+    .hh-label.green { background: rgba(104,211,145,0.2); color: #68d391; }
+    .hh-label.amber { background: rgba(246,173,85,0.2);  color: #f6ad55; }
+    .hh-text { color: #e2e8f0; }
+    .hh-sub  { font-size: 0.72rem; color: #718096; margin-left: auto; }
+
+    /* ===== Notion vs X 比較 ===== */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .cg-col {
+      background: #1e2035;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 18px 16px;
+    }
+    .cg-col.notion { border-color: rgba(255,255,255,0.15); }
+    .cg-col.x-col  { border-color: rgba(29,161,242,0.3); background: rgba(29,161,242,0.04); }
+    .cg-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #e2e8f0;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cg-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.8rem;
+    }
+    .cg-item:last-child { border-bottom: none; }
+    .cg-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .cg-dot.large  { background: #1da1f2; }
+    .cg-dot.medium { background: #68d391; width: 8px; height: 8px; }
+    .cg-dot.small  { background: #f6ad55; width: 6px; height: 6px; }
+    .cg-name { color: #a0aec0; }
+    .cg-equiv { margin-left: auto; font-size: 0.7rem; color: #4a5568; }
+
+    /* ===== ヒントボックス ===== */
+    .hint {
+      background: rgba(246,173,85,0.08);
+      border: 1px solid rgba(246,173,85,0.3);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-top: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .hint-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+    .hint-text { font-size: 0.85rem; color: #e2c97a; line-height: 1.7; }
+
+    /* ===== 情報ボックス（青） ===== */
+    .info-box {
+      background: rgba(29,161,242,0.07);
+      border: 1px solid rgba(29,161,242,0.3);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-top: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .info-box-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+    .info-box-text { font-size: 0.85rem; color: #90cdf4; line-height: 1.7; }
+
+    /* ===== 吹き出し ===== */
+    .bubble-box {
+      background: #1e2035;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-top: 16px;
+      position: relative;
+      font-size: 0.88rem;
+      color: #cbd5e0;
+      line-height: 1.7;
+    }
+    .bubble-box::before {
+      content: '💬';
+      position: absolute;
+      top: -14px;
+      left: 20px;
+      font-size: 1.1rem;
+    }
+
+    /* ===== まとめカード ===== */
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .sum-card {
+      background: #1e2035;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 20px 16px;
+      text-align: center;
+    }
+    .sum-icon { font-size: 1.8rem; display: block; margin-bottom: 10px; }
+    .sum-title { font-size: 0.88rem; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; }
+    .sum-desc  { font-size: 0.75rem; color: #718096; line-height: 1.5; }
+
+    /* ===== 比較テーブル ===== */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 0.82rem;
+    }
+    .compare-table th {
+      background: #1a1a2e;
+      color: #1da1f2;
+      font-weight: 700;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 2px solid rgba(29,161,242,0.3);
+    }
+    .compare-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      color: #a0aec0;
+      vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+    /* ===== シリーズ完結まとめ ===== */
+    .series-end {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border: 2px solid rgba(29,161,242,0.35);
+      border-radius: 20px;
+      padding: 32px 28px;
+      margin-top: 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .series-end::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(29,161,242,0.08) 0%, transparent 70%);
+    }
+    .se-icon { font-size: 2.5rem; display: block; margin-bottom: 12px; position: relative; }
+    .se-title {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #e2e8f0;
+      margin-bottom: 8px;
+      position: relative;
+    }
+    .se-sub {
+      font-size: 0.88rem;
+      color: #a0aec0;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .se-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 10px;
+      position: relative;
+    }
+    .se-step {
+      background: rgba(104,211,145,0.08);
+      border: 1px solid rgba(104,211,145,0.25);
+      border-radius: 10px;
+      padding: 12px 8px;
+      font-size: 0.75rem;
+      color: #9ae6b4;
+    }
+    .se-step-icon { font-size: 1.2rem; display: block; margin-bottom: 4px; }
+    .se-step-num  { font-size: 0.62rem; color: #4a5568; margin-bottom: 2px; }
+
+    /* ===== フッター ===== */
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #4a5568;
+      font-size: 0.78rem;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    /* ===== レスポンシブ ===== */
+    @media (max-width: 560px) {
+      .signboard-diagram { grid-template-columns: 1fr; }
+      .sb-arrow { transform: rotate(90deg); }
+      .reason-cards { grid-template-columns: 1fr; }
+      .compare-grid  { grid-template-columns: 1fr; }
+      .summary-cards { grid-template-columns: 1fr 1fr; }
+      .se-steps      { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 400px) {
+      .summary-cards { grid-template-columns: 1fr; }
+      .se-steps      { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== ヘッダー ===== -->
+<header>
+  <div class="header-series">
+    X記事作成手順シリーズ 全6回 ／ 第6回
+    <span class="bonus-badge">補足</span>
+  </div>
+  <h1>X（旧Twitter）記事作成手順<br><span>補足：なぜ見出しをつけるか</span></h1>
+  <p class="subtitle">これからXを始める人・記事作成に慣れていない人向けの図解ガイド</p>
+  <div class="header-tags">
+    <span class="tag">初心者向け</span>
+    <span class="tag">見出しの役割</span>
+    <span class="tag">読みやすさ</span>
+    <span class="tag">SEO</span>
+    <span class="tag">ヘッディング</span>
+  </div>
+</header>
+
+<!-- ===== 補足バナー ===== -->
+<div class="bonus-banner">
+  <div class="bonus-inner">
+    <span class="bi-icon">📌</span>
+    <span>第1〜5回でX記事作成の全手順を解説しました。この動画は<strong>「なぜ見出しをつけるのか」</strong>を改めて丁寧に解説する補足動画です。</span>
+  </div>
+</div>
+
+<!-- ===== 目次 ===== -->
+<div class="toc-wrapper">
+  <div class="toc">
+    <h2>目次</h2>
+    <ol>
+      <li><a href="javascript:void(0)" onclick="jumpToSection('s1')">はじめに：この補足動画の目的<span class="toc-ts">00:00</span></a></li>
+      <li><a href="javascript:void(0)" onclick="jumpToSection('s2')">見出しの役割：タイトル（看板）を細分化する目印<span class="toc-ts">01:01</span></a></li>
+      <li><a href="javascript:void(0)" onclick="jumpToSection('s3')">見出しをつけた方がいい理由①：読みやすさ<span class="toc-ts">02:06</span></a></li>
+      <li><a href="javascript:void(0)" onclick="jumpToSection('s4')">見出しをつけた方がいい理由②：プラットフォーム側の認識<span class="toc-ts">03:09</span></a></li>
+      <li><a href="javascript:void(0)" onclick="jumpToSection('s5')">実演：X記事での見出し・サブ見出しの設定方法<span class="toc-ts">06:21</span></a></li>
+      <li><a href="javascript:void(0)" onclick="jumpToSection('s6')">Notionでの見出し設定との比較<span class="toc-ts">09:08</span></a></li>
+      <li><a href="javascript:void(0)" onclick="jumpToSection('s7')">おわりに：まずは無理のない範囲から始めよう<span class="toc-ts">10:39</span></a></li>
+    </ol>
+  </div>
+</div>
+
+<!-- ===== メイン ===== -->
+<main>
+
+  <!-- ===== Section 1 ===== -->
+  <section class="section" id="s1">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <div class="section-title-block">
+        <h2>はじめに：この補足動画の目的</h2>
+        <span class="timestamp">00:00.0</span>
+      </div>
+    </div>
+
+    <p class="desc">第1〜5回の動画では、X記事作成の手順の中で「見出しをつける」という説明をしてきました。しかし<strong>「そもそもなぜ見出しが必要なの？」</strong>という説明が不足していたため、この補足動画で改めて解説します。</p>
+
+    <div class="card">
+      <div style="font-size:0.78rem;color:#718096;margin-bottom:14px;text-align:center;">この動画で分かること</div>
+      <div class="summary-cards" style="margin-top:0;">
+        <div class="sum-card">
+          <span class="sum-icon">🏷️</span>
+          <div class="sum-title">見出しとは何か</div>
+          <div class="sum-desc">タイトルとの違い、記事の中での役割を理解する</div>
+        </div>
+        <div class="sum-card">
+          <span class="sum-icon">📖</span>
+          <div class="sum-title">つける理由</div>
+          <div class="sum-desc">読者にとって・プラットフォームにとっての2つのメリット</div>
+        </div>
+        <div class="sum-card">
+          <span class="sum-icon">⚙️</span>
+          <div class="sum-title">設定方法</div>
+          <div class="sum-desc">X記事でのヘッディング・サブヘッディングの実際の操作</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hint">
+      <span class="hint-icon">💡</span>
+      <span class="hint-text">1000文字程度の短い記事なら、見出しなしでも読める文章になります。<strong>まずは記事を量産することを優先</strong>して、慣れてきたら見出しを追加していくのもOKです。</span>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ===== Section 2 ===== -->
+  <section class="section" id="s2">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <div class="section-title-block">
+        <h2>見出しの役割：タイトル（看板）を細分化する目印</h2>
+        <span class="timestamp">01:01.0</span>
+      </div>
+    </div>
+
+    <p class="desc"><strong>タイトル</strong>と<strong>見出し</strong>は似ているようで役割が違います。お店の「看板」と「メニュー表」の関係で考えると分かりやすいです。</p>
+
+    <div class="signboard-diagram">
+      <div class="sb-box title-box">
+        <span class="sb-icon">🏪</span>
+        <div class="sb-label blue">タイトル</div>
+        <div class="sb-name">お店の看板</div>
+        <div class="sb-desc">記事全体のテーマを一言で伝える。読む前から「この記事は何について書いているか」が分かる。</div>
+        <div class="sb-example">例：「15分間の英会話から始める海外リモートワーク」</div>
+      </div>
+      <div class="sb-arrow">→</div>
+      <div class="sb-box heading-box">
+        <span class="sb-icon">📋</span>
+        <div class="sb-label green">見出し</div>
+        <div class="sb-name">メニュー表・目次</div>
+        <div class="sb-desc">タイトルのテーマをより細かく分けて伝える。「この記事のどこに何が書いてあるか」を示す目印。</div>
+        <div class="sb-example">例：「最初の不安」「準備したこと」「実際の体験談」</div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <p style="font-size:0.78rem;color:#718096;text-align:center;margin-bottom:12px;">記事の構造イメージ</p>
+      <div class="article-structure">
+        <div class="as-label">タイトル → 見出し → サブ見出し → 本文 の階層構造</div>
+        <div class="as-title">
+          <div class="as-title-label">タイトル（記事全体のテーマ）</div>
+          15分間の英会話から始める海外リモートワーク
+        </div>
+        <div class="as-heading">
+          <div class="as-heading-label">見出し（大項目）</div>
+          最初に感じた不安
+        </div>
+        <div class="as-subheading">
+          <div class="as-subheading-label">サブ見出し（中項目）</div>
+          英語力への不安
+        </div>
+        <div class="as-body">本文テキスト…</div>
+        <div class="as-subheading">
+          <div class="as-subheading-label">サブ見出し（中項目）</div>
+          案件獲得への不安
+        </div>
+        <div class="as-body">本文テキスト…</div>
+        <div class="as-heading">
+          <div class="as-heading-label">見出し（大項目）</div>
+          15分を乗り切るための準備
+        </div>
+        <div class="as-body">本文テキスト…</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ===== Section 3 ===== -->
+  <section class="section" id="s3">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <div class="section-title-block">
+        <h2>見出しをつけた方がいい理由①：読みやすさ</h2>
+        <span class="timestamp">02:06.0</span>
+      </div>
+    </div>
+
+    <p class="desc">見出しをつける1つ目の理由は<strong>「読者にとっての読みやすさ」</strong>です。</p>
+
+    <div class="reason-cards">
+      <div class="reason-card r1">
+        <div class="rc-num blue">理由 01</div>
+        <span class="rc-icon">📰</span>
+        <div class="rc-title">記事らしくなる</div>
+        <div class="rc-desc">見出しで項目が分かれることで、ブログ記事のような読みやすい構成になります。</div>
+        <div class="rc-merit">
+          <div class="rc-merit-item">読んでいて疲れにくい</div>
+          <div class="rc-merit-item">情報が整理されて見える</div>
+          <div class="rc-merit-item">プロっぽい印象になる</div>
+        </div>
+      </div>
+      <div class="reason-card r1">
+        <div class="rc-num blue">理由 01</div>
+        <span class="rc-icon">🔍</span>
+        <div class="rc-title">読みたい部分だけ読める</div>
+        <div class="rc-desc">忙しい読者は最初に見出しをスキャンして、気になる部分だけ読むことができます。</div>
+        <div class="rc-merit">
+          <div class="rc-merit-item">時間がない人でも読める</div>
+          <div class="rc-merit-item">必要な情報にすぐたどり着ける</div>
+          <div class="rc-merit-item">最後まで読んでもらいやすくなる</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bubble-box">
+      ブログ記事を読むとき、最初に見出しを流し読みして「ここだけ読もう」と決めた経験はありませんか？見出しは<strong>読者の「読む負担」を減らす</strong>大切な役割を持っています。
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ===== Section 4 ===== -->
+  <section class="section" id="s4">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <div class="section-title-block">
+        <h2>見出しをつけた方がいい理由②：プラットフォーム側の認識</h2>
+        <span class="timestamp">03:09.0</span>
+      </div>
+    </div>
+
+    <p class="desc">2つ目の理由は<strong>「プラットフォーム（X）側に記事の質が伝わりやすくなる」</strong>という点です。</p>
+
+    <div class="reason-cards">
+      <div class="reason-card r2">
+        <div class="rc-num green">理由 02</div>
+        <span class="rc-icon">🏷️</span>
+        <div class="rc-title">見出しはただの太字ではない</div>
+        <div class="rc-desc">見出しを設定すると、見た目が大きくなるだけでなく、裏側に<strong>「タグ」</strong>が付きます。このタグがプラットフォームに「ここが見出しです」と伝えます。</div>
+        <div class="rc-merit">
+          <div class="rc-merit-item">ブログでいう「H1・H2・H3タグ」と同じ仕組み</div>
+          <div class="rc-merit-item">AIやシステムが記事の構造を理解できる</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="seo-diagram">
+      <div style="font-size:0.78rem;color:#718096;margin-bottom:14px;text-align:center;">見出しタグがもたらす効果の流れ</div>
+      <div class="seo-flow">
+        <div class="seo-box">見出しを設定する</div>
+        <div class="seo-arrow">→</div>
+        <div class="seo-box highlight">タグが付与される</div>
+        <div class="seo-arrow">→</div>
+        <div class="seo-box">プラットフォームが<br>構造を認識</div>
+        <div class="seo-arrow">→</div>
+        <div class="seo-box">「質の高い記事」<br>と判断されやすい</div>
+        <div class="seo-arrow">→</div>
+        <div class="seo-box">おすすめ・検索に<br>表示されやすくなる</div>
+      </div>
+      <div class="seo-note">
+        ※ ブログでは「SEO（検索エンジン最適化）」と呼ばれる概念です。XはGoogleの検索結果には出にくいですが、<strong>Xのおすすめ通知やタイムラインへの表示</strong>に影響する可能性があります。断言はできませんが、見出しをつけておくことで損はありません。
+      </div>
+    </div>
+
+    <div class="info-box">
+      <span class="info-box-icon">ℹ️</span>
+      <span class="info-box-text"><strong>SEO（エスイーオー）</strong>とは「Search Engine Optimization（検索エンジン最適化）」の略で、記事が検索結果の上位に表示されやすくなるための工夫のことです。見出しタグをつけることはSEO対策の基本の一つです。</span>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ===== Section 5 ===== -->
+  <section class="section" id="s5">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <div class="section-title-block">
+        <h2>実演：X記事での見出し・サブ見出しの設定方法</h2>
+        <span class="timestamp">06:21.9</span>
+      </div>
+    </div>
+
+    <p class="desc">X記事では<strong>「ヘッディング」</strong>と<strong>「サブヘッディング」</strong>の2種類の見出しが使えます。実際の設定手順を見てみましょう。</p>
+
+    <div class="demo-steps">
+      <div class="ds-step">
+        <div class="ds-dot">1</div>
+        <div class="ds-content">
+          <h3>見出しにしたいテキストを選択する</h3>
+          <p>見出しにしたい文章をドラッグして選択する。1行だけ選択するのがポイント（複数行を選択すると意図しない部分にも見出しがつく場合がある）。</p>
+        </div>
+      </div>
+      <div class="ds-step">
+        <div class="ds-dot">2</div>
+        <div class="ds-content">
+          <h3>メニューから「ヘッディング」または「サブヘッディング」を選ぶ</h3>
+          <p>テキスト選択後に表示されるメニューから見出しの種類を選択する。</p>
+        </div>
+      </div>
+      <div class="ds-step">
+        <div class="ds-dot">3</div>
+        <div class="ds-content">
+          <h3>見出しが設定される</h3>
+          <p>選択したテキストが大きく太字になり、見出しとして認識される。番号リストと組み合わせる場合は番号が消えることがあるので注意。</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <p style="font-size:0.78rem;color:#718096;text-align:center;margin-bottom:12px;">ヘッディングとサブヘッディングの使い分け</p>
+      <div class="heading-hierarchy">
+        <div class="hh-item h1">
+          <span class="hh-label blue">ヘッディング（大見出し）</span>
+          <span class="hh-text">実際にやってみて気づいた2つのこと</span>
+          <span class="hh-sub">大きな器</span>
+        </div>
+        <div class="hh-item h2">
+          <span class="hh-label green">サブヘッディング（中見出し）</span>
+          <span class="hh-text">私だから話せること</span>
+          <span class="hh-sub">小さな器（大見出しの中に収まる）</span>
+        </div>
+        <div class="hh-item h2">
+          <span class="hh-label green">サブヘッディング（中見出し）</span>
+          <span class="hh-text">初心者が陥りがちなミス</span>
+          <span class="hh-sub">小さな器（大見出しの中に収まる）</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hint">
+      <span class="hint-icon">💡</span>
+      <span class="hint-text"><strong>ヘッディング</strong>は「大きな話題のまとまり」を示し、<strong>サブヘッディング</strong>はその中の「細かい項目」を示します。「〇〇について2つのことを説明します」と書いたら、その2つをサブヘッディングにするイメージです。</span>
+    </div>
+
+    <div class="info-box">
+      <span class="info-box-icon">⚠️</span>
+      <span class="info-box-text">番号リスト（①②③…）と見出しを組み合わせると、番号が消えてしまうことがあります。その場合は、見出しにしたい行だけを改行で分けてから設定すると解決できます。</span>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ===== Section 6 ===== -->
+  <section class="section" id="s6">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <div class="section-title-block">
+        <h2>Notionでの見出し設定との比較</h2>
+        <span class="timestamp">09:08.8</span>
+      </div>
+    </div>
+
+    <p class="desc">Notionなど他のツールでも見出しを設定できます。X記事との違いを比較してみましょう。</p>
+
+    <div class="compare-grid">
+      <div class="cg-col notion">
+        <div class="cg-title">📓 Notionの場合</div>
+        <div class="cg-item">
+          <div class="cg-dot large"></div>
+          <span class="cg-name">見出し1（H1）</span>
+          <span class="cg-equiv">最大・大見出し</span>
+        </div>
+        <div class="cg-item">
+          <div class="cg-dot medium"></div>
+          <span class="cg-name">見出し2（H2）</span>
+          <span class="cg-equiv">中見出し</span>
+        </div>
+        <div class="cg-item">
+          <div class="cg-dot small"></div>
+          <span class="cg-name">見出し3（H3）</span>
+          <span class="cg-equiv">小見出し</span>
+        </div>
+        <div style="margin-top:12px;font-size:0.75rem;color:#718096;">数字が小さいほど大きな見出し。視覚的にもサイズが変わる。</div>
+      </div>
+      <div class="cg-col x-col">
+        <div class="cg-title">🐦 X記事の場合</div>
+        <div class="cg-item">
+          <div class="cg-dot large" style="background:#1da1f2;"></div>
+          <span class="cg-name">ヘッディング</span>
+          <span class="cg-equiv">大見出し（H1相当）</span>
+        </div>
+        <div class="cg-item">
+          <div class="cg-dot medium" style="background:#90cdf4;"></div>
+          <span class="cg-name">サブヘッディング</span>
+          <span class="cg-equiv">中見出し（H2相当）</span>
+        </div>
+        <div style="margin-top:12px;font-size:0.75rem;color:#718096;">Notionよりシンプルな2段階構成。仕組みは同じで、大見出しの中に中見出しが収まる。</div>
+      </div>
+    </div>
+
+    <table class="compare-table" style="margin-top:20px;">
+      <thead>
+        <tr>
+          <th>ツール</th>
+          <th>見出しの種類</th>
+          <th>考え方</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Notion / ブログ</td>
+          <td>見出し1・2・3（H1〜H3）</td>
+          <td>数字が小さいほど大きな見出し。3段階以上の階層が作れる</td>
+        </tr>
+        <tr>
+          <td><strong>X記事</strong></td>
+          <td>ヘッディング・サブヘッディング</td>
+          <td>2段階のシンプルな構成。ヘッディングの中にサブヘッディングが入る</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="bubble-box">
+      名前は違いますが、考え方は同じです。<strong>「大きな話題の器（ヘッディング）の中に、小さな話題の器（サブヘッディング）を入れる」</strong>というイメージで使いましょう。
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ===== Section 7 ===== -->
+  <section class="section" id="s7">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <div class="section-title-block">
+        <h2>おわりに：まずは無理のない範囲から始めよう</h2>
+        <span class="timestamp">10:39.8</span>
+      </div>
+    </div>
+
+    <p class="desc">見出しは大切ですが、<strong>最初から完璧にこだわる必要はありません</strong>。まずは記事を書くことに慣れることが最優先です。</p>
+
+    <div class="reason-cards" style="margin-top:0;">
+      <div class="reason-card">
+        <span class="rc-icon">🚀</span>
+        <div class="rc-title">まず量産を優先</div>
+        <div class="rc-desc">最初はタイトルとテーマだけAIに相談して、本文をいきなり書いてしまうのもOK。1000文字程度なら見出しなしでも読める。</div>
+      </div>
+      <div class="reason-card">
+        <span class="rc-icon">📈</span>
+        <div class="rc-title">慣れたら見出しを追加</div>
+        <div class="rc-desc">記事を量産して投稿に慣れてきたら、見出しをつけるステップを加えていく。少しずつクオリティを上げていけばOK。</div>
+      </div>
+    </div>
+
+    <div class="series-end">
+      <span class="se-icon">🎓</span>
+      <div class="se-title">シリーズ全6回 完結！</div>
+      <div class="se-sub">全ステップをマスターすれば、X記事を一本完成させることができます</div>
+      <div class="se-steps">
+        <div class="se-step">
+          <span class="se-step-icon">🏷️</span>
+          <div class="se-step-num">第1回</div>
+          タイトル決め
+        </div>
+        <div class="se-step">
+          <span class="se-step-icon">🗂️</span>
+          <div class="se-step-num">第2回</div>
+          見出し決め
+        </div>
+        <div class="se-step">
+          <span class="se-step-icon">✍️</span>
+          <div class="se-step-num">第3回</div>
+          本文下書き
+        </div>
+        <div class="se-step">
+          <span class="se-step-icon">🔍</span>
+          <div class="se-step-num">第4回</div>
+          修正・整形
+        </div>
+        <div class="se-step">
+          <span class="se-step-icon">🖼️</span>
+          <div class="se-step-num">第5回</div>
+          サムネイル
+        </div>
+        <div class="se-step">
+          <span class="se-step-icon">📌</span>
+          <div class="se-step-num">第6回</div>
+          補足：見出し
+        </div>
+      </div>
+    </div>
+
+    <div class="hint" style="margin-top:20px;">
+      <span class="hint-icon">✨</span>
+      <span class="hint-text">シリーズ全6回をご覧いただきありがとうございました。分からないことがあれば直接質問してください。皆さんの参考になれば幸いです。</span>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== フッター ===== -->
+<footer>
+  <p>X記事作成手順シリーズ 全6回 ／ 第6回「補足：なぜ見出しをつけるか」</p>
+  <p style="margin-top:6px;">このガイドは動画の内容を元に図解したものです。シリーズ全6回をご覧いただきありがとうございました。</p>
+</footer>
+
+<script>
+function jumpToSection(id) {
+  var el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+</script>
+
+</body>
+</html>
