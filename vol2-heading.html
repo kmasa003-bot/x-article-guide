@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>X記事作成手順 第2回：見出しの決め方</title>
+  <style>
+    /* ===== リセット & ベース ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: #0f0f13;
+      color: #e8e8f0;
+      line-height: 1.7;
+    }
+
+    /* ===== ヘッダー ===== */
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      padding: 60px 24px 50px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(29,161,242,0.18) 0%, transparent 70%);
+    }
+    .header-series {
+      display: inline-block;
+      background: rgba(29,161,242,0.2);
+      border: 1px solid rgba(29,161,242,0.5);
+      color: #1da1f2;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      padding: 4px 16px;
+      border-radius: 20px;
+      margin-bottom: 18px;
+      position: relative;
+    }
+    header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1.3;
+      position: relative;
+    }
+    header h1 span { color: #1da1f2; }
+    header p.subtitle {
+      margin-top: 14px;
+      color: #a0aec0;
+      font-size: 0.95rem;
+      position: relative;
+    }
+    .header-tags {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+      position: relative;
+    }
+    .tag {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #cbd5e0;
+      font-size: 0.78rem;
+      padding: 4px 14px;
+      border-radius: 20px;
+    }
+
+    /* ===== 前回のおさらいバナー ===== */
+    .recap-banner {
+      max-width: 760px;
+      margin: 32px auto 0;
+      padding: 0 20px;
+    }
+    .recap-inner {
+      background: rgba(154,117,234,0.1);
+      border: 1px solid rgba(154,117,234,0.35);
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.83rem;
+      color: #c4b5fd;
+    }
+    .recap-inner span.recap-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+    /* ===== 目次 ===== */
+    .toc-wrapper {
+      max-width: 760px;
+      margin: 24px auto 0;
+      padding: 0 20px;
+    }
+    .toc {
+      background: #1a1a2e;
+      border: 1px solid rgba(29,161,242,0.25);
+      border-radius: 16px;
+      padding: 28px 32px;
+    }
+    .toc h2 {
+      font-size: 1rem;
+      color: #1da1f2;
+      margin-bottom: 16px;
+      letter-spacing: 0.06em;
+    }
+    .toc ol { list-style: none; counter-reset: toc-counter; }
+    .toc ol li {
+      counter-increment: toc-counter;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .toc ol li:last-child { border-bottom: none; }
+    .toc ol li a {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+    .toc ol li a:hover { color: #1da1f2; }
+    .toc ol li a::before {
+      content: counter(toc-counter, decimal-leading-zero);
+      color: #1da1f2;
+      font-size: 0.75rem;
+      font-weight: 700;
+      min-width: 24px;
+    }
+    .toc-ts {
+      margin-left: auto;
+      font-size: 0.72rem;
+      color: #718096;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ===== メインコンテンツ ===== */
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    /* ===== セクション共通 ===== */
+    .section { margin-bottom: 56px; }
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .section-num {
+      background: linear-gradient(135deg, #1da1f2, #0d8ecf);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 900;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .section-title-block h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+    .timestamp {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(29,161,242,0.12);
+      border: 1px solid rgba(29,161,242,0.3);
+      color: #1da1f2;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 20px;
+      margin-top: 5px;
+      font-variant-numeric: tabular-nums;
+    }
+    .timestamp::before { content: '▶'; font-size: 0.6rem; }
+
+    /* ===== 説明テキスト ===== */
+    .desc {
+      color: #a0aec0;
+      font-size: 0.9rem;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    /* ===== カード ===== */
+    .card {
+      background: #1a1a2e;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    /* ===== 記事構成の3要素 ===== */
+    .article-structure {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .structure-item {
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .si-intro  { background: rgba(104,211,145,0.08); border: 1px solid rgba(104,211,145,0.3); }
+    .si-heading{ background: rgba(29,161,242,0.08);  border: 1px solid rgba(29,161,242,0.4);  }
+    .si-close  { background: rgba(246,173,85,0.08);  border: 1px solid rgba(246,173,85,0.3);  }
+    .si-icon {
+      font-size: 1.6rem;
+      flex-shrink: 0;
+      width: 44px;
+      text-align: center;
+    }
+    .si-body {}
+    .si-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .si-intro  .si-label { color: #68d391; }
+    .si-heading .si-label { color: #1da1f2; }
+    .si-close  .si-label { color: #f6ad55; }
+    .si-body h3 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #e2e8f0;
+      margin-bottom: 4px;
+    }
+    .si-body p {
+      font-size: 0.82rem;
+      color: #718096;
+      line-height: 1.6;
+    }
+    .si-body .example {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      color: #a0aec0;
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      padding: 6px 10px;
+      border-left: 3px solid rgba(255,255,255,0.15);
+    }
+
+    /* ===== 記事構造ビジュアル ===== */
+    .article-visual {
+      background: #0d1117;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+    .av-title {
+      font-size: 0.72rem;
+      color: #4a5568;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .av-block {
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    .av-block:last-child { margin-bottom: 0; }
+    .av-intro   { background: rgba(104,211,145,0.12); color: #9ae6b4; border: 1px solid rgba(104,211,145,0.25); }
+    .av-h1      { background: rgba(29,161,242,0.12);  color: #90cdf4; border: 1px solid rgba(29,161,242,0.3);  }
+    .av-h2      { background: rgba(29,161,242,0.07);  color: #63b3ed; border: 1px solid rgba(29,161,242,0.2);  }
+    .av-close   { background: rgba(246,173,85,0.12);  color: #fbd38d; border: 1px solid rgba(246,173,85,0.25); }
+    .av-size {
+      font-size: 0.68rem;
+      color: #4a5568;
+      float: right;
+      font-weight: 400;
+    }
+
+    /* ===== ポイントグリッド ===== */
+    .points-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .point-card {
+      background: #1e2035;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 20px 16px;
+      text-align: center;
+    }
+    .point-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+    .point-card h3 { font-size: 0.88rem; font-weight: 700; color: #e2e8f0; margin-bottom: 6px; }
+    .point-card p  { font-size: 0.78rem; color: #718096; line-height: 1.6; }
+
+    /* ===== ヒントボックス ===== */
+    .hint {
+      background: rgba(246,173,85,0.08);
+      border: 1px solid rgba(246,173,85,0.3);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-top: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .hint-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+    .hint-text { font-size: 0.85rem; color: #e2c97a; line-height: 1.7; }
+
+    /* ===== 情報ボックス（青） ===== */
+    .info-box {
+      background: rgba(29,161,242,0.07);
+      border: 1px solid rgba(29,161,242,0.3);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-top: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .info-box-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+    .info-box-text { font-size: 0.85rem; color: #90cdf4; line-height: 1.7; }
+
+    /* ===== ステップ ===== */
+    .steps { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: #1e2035;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .step-num {
+      background: linear-gradient(135deg, #1da1f2, #0d8ecf);
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .step-body h3 { font-size: 0.9rem; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+    .step-body p  { font-size: 0.8rem; color: #718096; line-height: 1.6; }
+
+    /* ===== プロンプト例 ===== */
+    .prompt-box {
+      background: #0d1117;
+      border: 1px solid rgba(29,161,242,0.3);
+      border-radius: 12px;
+      padding: 24px 20px 20px;
+      margin-top: 16px;
+      position: relative;
+    }
+    .prompt-label {
+      position: absolute;
+      top: -10px;
+      left: 16px;
+      background: #1da1f2;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 10px;
+    }
+    .prompt-text {
+      font-family: 'Courier New', monospace;
+      font-size: 0.83rem;
+      color: #a8d8f0;
+      line-height: 1.9;
+      white-space: pre-wrap;
+    }
+    .prompt-highlight { color: #ffd700; font-weight: 700; }
+    .prompt-comment   { color: #4a5568; font-style: italic; }
+
+    /* ===== チャットデモ ===== */
+    .chat-demo {
+      background: #0d1117;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+    .chat-label {
+      font-size: 0.72rem;
+      color: #4a5568;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .chat-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+      align-items: flex-start;
+    }
+    .chat-row.ai { flex-direction: row-reverse; }
+    .chat-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .avatar-user { background: #1da1f2; color: white; }
+    .avatar-ai   { background: #2d3748; color: #e2e8f0; }
+    .chat-bubble {
+      max-width: 80%;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+    .bubble-user {
+      background: rgba(29,161,242,0.2);
+      border: 1px solid rgba(29,161,242,0.3);
+      color: #bee3f8;
+    }
+    .bubble-ai {
+      background: #1e2035;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #a0aec0;
+    }
+
+    /* ===== 見出しセット例 ===== */
+    .heading-sets {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .heading-set {
+      background: #1e2035;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+    .heading-set.selected {
+      border-color: rgba(29,161,242,0.5);
+      background: rgba(29,161,242,0.07);
+    }
+    .hs-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #718096;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .heading-set.selected .hs-label { color: #1da1f2; }
+    .hs-selected-badge {
+      background: #1da1f2;
+      color: white;
+      font-size: 0.65rem;
+      padding: 1px 7px;
+      border-radius: 8px;
+    }
+    .hs-items { display: flex; flex-direction: column; gap: 6px; }
+    .hs-item {
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.83rem;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hs-num {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #1da1f2;
+      min-width: 20px;
+    }
+
+    /* ===== NG/OK比較 ===== */
+    .ng-ok {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .ng-box, .ok-box {
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .ng-box { background: rgba(252,129,129,0.07); border: 1px solid rgba(252,129,129,0.3); }
+    .ok-box { background: rgba(104,211,145,0.07); border: 1px solid rgba(104,211,145,0.3); }
+    .ng-label { font-size: 0.72rem; font-weight: 700; color: #fc8181; margin-bottom: 8px; }
+    .ok-label { font-size: 0.72rem; font-weight: 700; color: #68d391; margin-bottom: 8px; }
+    .ng-box p, .ok-box p { font-size: 0.82rem; color: #a0aec0; line-height: 1.6; }
+
+    /* ===== まとめグリッド ===== */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .summary-card {
+      background: linear-gradient(135deg, #1a1a2e, #1e2035);
+      border: 1px solid rgba(29,161,242,0.2);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .summary-card h3 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #1da1f2;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .summary-card ul { list-style: none; font-size: 0.82rem; color: #a0aec0; line-height: 1.9; }
+    .summary-card ul li::before { content: '✓ '; color: #68d391; font-weight: 700; }
+
+    /* ===== 区切り線 ===== */
+    .divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 48px 0; }
+
+    /* ===== フッター ===== */
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #4a5568;
+      font-size: 0.78rem;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    /* ===== 吹き出し ===== */
+    .bubble-box {
+      background: #1e2035;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-top: 16px;
+      position: relative;
+      font-size: 0.88rem;
+      color: #cbd5e0;
+      line-height: 1.7;
+    }
+    .bubble-box::before {
+      content: '💬';
+      position: absolute;
+      top: -14px;
+      left: 20px;
+      font-size: 1.1rem;
+    }
+
+    /* ===== 経験談バッジ ===== */
+    .exp-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(154,117,234,0.15);
+      border: 1px solid rgba(154,117,234,0.35);
+      color: #c4b5fd;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+
+    /* ===== レスポンシブ ===== */
+    @media (max-width: 520px) {
+      .points-grid { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .ng-ok { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== ヘッダー ===== -->
+<header>
+  <div class="header-series">X記事作成手順シリーズ 全6回 ／ 第2回</div>
+  <h1>X（旧Twitter）記事作成手順<br><span>見出しの決め方</span></h1>
+  <p class="subtitle">これからXを始める人・記事作成に慣れていない人向けの図解ガイド</p>
+  <div class="header-tags">
+    <span class="tag">初心者向け</span>
+    <span class="tag">AI活用</span>
+    <span class="tag">見出し構成</span>
+    <span class="tag">Claude</span>
+  </div>
+</header>
+
+<!-- ===== 前回のおさらい ===== -->
+<div class="recap-banner">
+  <div class="recap-inner">
+    <span class="recap-icon">📌</span>
+    <span>第1回では記事の<strong>タイトル決め</strong>を解説しました。今回はその続き、記事の骨格となる<strong>見出し（構成）の決め方</strong>です。</span>
+  </div>
+</div>
+
+<!-- ===== 目次 ===== -->
+<div class="toc-wrapper">
+  <div class="toc">
+    <h2>目次</h2>
+    <ol>
+      <li><a href="javascript:void(0)" onclick="jumpToSection('s1')">はじめに：見出し構成決めの重要性<span class="toc-ts">00:00</span></a></li>
+      <li><a href="javascript:void(0)" onclick="jumpToSection('s2')">記事の3つの構成要素<span class="toc-ts">01:09</span></a></li>
+      <li><a href="javascript:void(0)" onclick="jumpToSection('s3')">アイデアが浮かばないときはAIに丸投げ<span class="toc-ts">03:37</span></a></li>
+      <li><a href="javascript:void(0)" onclick="jumpToSection('s4')">専門知識より「量産」が大事<span class="toc-ts">04:30</span></a></li>
+      <li><a href="javascript:void(0)" onclick="jumpToSection('s5')">Claudeで見出しを作成するデモ<span class="toc-ts">06:31</span></a></li>
+      <li><a href="javascript:void(0)" onclick="jumpToSection('s6')">精度を上げるための具体情報の伝え方<span class="toc-ts">10:27</span></a></li>
+      <li><a href="javascript:void(0)" onclick="jumpToSection('s7')">見出し決めのまとめとAI活用のコツ<span class="toc-ts">12:40</span></a></li>
+    </ol>
+  </div>
+</div>
+
+<!-- ===== メイン ===== -->
+<main>
+
+  <!-- ===== Section 1 ===== -->
+  <section class="section" id="s1">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <div class="section-title-block">
+        <h2>はじめに：見出し構成決めの重要性</h2>
+        <span class="timestamp">00:00.0</span>
+      </div>
+    </div>
+
+    <p class="desc">第2回は<strong>「見出し（構成）決め」</strong>です。タイトルが「お店の看板」なら、見出しは「メニューの章立て」。読者が記事を読み進めるための道案内になります。</p>
+
+    <div class="card">
+      <div class="points-grid">
+        <div class="point-card">
+          <span class="point-icon">🏷️</span>
+          <h3>タイトル＝看板</h3>
+          <p>お店に入るきっかけ。前回（第1回）で決めた部分。</p>
+        </div>
+        <div class="point-card">
+          <span class="point-icon">📋</span>
+          <h3>見出し＝章立て</h3>
+          <p>記事の中身を整理する骨格。今回（第2回）で決める部分。</p>
+        </div>
+        <div class="point-card">
+          <span class="point-icon">📏</span>
+          <h3>目安は約2000文字</h3>
+          <p>序文＋見出し2〜3個＋締めの文章で構成するのが基本。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ===== Section 2 ===== -->
+  <section class="section" id="s2">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <div class="section-title-block">
+        <h2>記事の3つの構成要素</h2>
+        <span class="timestamp">01:09.0</span>
+      </div>
+    </div>
+
+    <p class="desc">X記事は大きく3つのパーツで構成されます。それぞれの役割を理解しておくと、見出しが決めやすくなります。</p>
+
+    <div class="article-structure">
+      <div class="structure-item si-intro">
+        <div class="si-icon">📖</div>
+        <div class="si-body">
+          <div class="si-label">PART 1</div>
+          <h3>序文（イントロ）</h3>
+          <p>「なぜこのテーマで書こうと思ったか」を伝える部分。読者の共感を引き出す入口。</p>
+          <div class="example">例：「アップワークで3ヶ月間案件がゼロだった経験から、この記事を書こうと思いました」</div>
+        </div>
+      </div>
+      <div class="structure-item si-heading">
+        <div class="si-icon">🗂️</div>
+        <div class="si-body">
+          <div class="si-label">PART 2（メイン）</div>
+          <h3>見出し＋本文（2〜3個）</h3>
+          <p>タイトルのテーマを細分化して伝える部分。今回決める核心。見出しごとに1つのメッセージを伝えるのが基本。</p>
+          <div class="example">例：「見出し①なぜ3ヶ月間ゼロだったのか」「見出し②打開するためにやったこと」</div>
+        </div>
+      </div>
+      <div class="structure-item si-close">
+        <div class="si-icon">🎯</div>
+        <div class="si-body">
+          <div class="si-label">PART 3</div>
+          <h3>締めの文章（まとめ＋行動喚起）</h3>
+          <p>記事全体のまとめと、読者への行動を促すメッセージ。YouTubeの「チャンネル登録お願いします」と同じ役割。</p>
+          <div class="example">例：「まずは1つだけ試してみてください。感想はコメントで教えてください！」</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="article-visual">
+      <div class="av-title">記事の構造イメージ（約2000文字）</div>
+      <div class="av-block av-intro">📖 序文：なぜ書こうと思ったか（共感・きっかけ）<span class="av-size">〜300字</span></div>
+      <div class="av-block av-h1">🗂️ 見出し①：メインテーマを細分化したメッセージA<span class="av-size">〜600字</span></div>
+      <div class="av-block av-h2">🗂️ 見出し②：メインテーマを細分化したメッセージB<span class="av-size">〜600字</span></div>
+      <div class="av-block av-close">🎯 締めの文章：まとめ＋行動喚起<span class="av-size">〜300字</span></div>
+    </div>
+
+    <div class="hint">
+      <span class="hint-icon">💡</span>
+      <span class="hint-text">見出しは<strong>タイトルのメインテーマを「細分化」したもの</strong>です。タイトルで「何について書くか」を示し、見出しで「どういう順番で伝えるか」を整理します。</span>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ===== Section 3 ===== -->
+  <section class="section" id="s3">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <div class="section-title-block">
+        <h2>アイデアが浮かばないときはAIに丸投げ</h2>
+        <span class="timestamp">03:37.0</span>
+      </div>
+    </div>
+
+    <p class="desc">見出しが思い浮かばなくても大丈夫。第1回のタイトル決めと同じで、<strong>まずAIに候補を出してもらう</strong>ことから始めてOKです。</p>
+
+    <div class="card">
+      <div style="text-align:center;padding:8px 0 16px;">
+        <div style="font-size:0.78rem;color:#718096;margin-bottom:16px;">AIとの壁打ちで見出しが決まる流れ</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;">
+          <div style="background:#1e2035;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 14px;font-size:0.8rem;color:#a0aec0;text-align:center;min-width:110px;">
+            <div style="font-size:1.3rem;margin-bottom:6px;">😶</div>
+            見出しが<br>浮かばない
+          </div>
+          <div style="color:#1da1f2;font-size:1.2rem;">→</div>
+          <div style="background:rgba(29,161,242,0.1);border:1px solid rgba(29,161,242,0.3);border-radius:10px;padding:12px 14px;font-size:0.8rem;color:#bee3f8;text-align:center;min-width:110px;">
+            <div style="font-size:1.3rem;margin-bottom:6px;">🤖</div>
+            AIに候補を<br>出してもらう
+          </div>
+          <div style="color:#1da1f2;font-size:1.2rem;">→</div>
+          <div style="background:#1e2035;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 14px;font-size:0.8rem;color:#a0aec0;text-align:center;min-width:110px;">
+            <div style="font-size:1.3rem;margin-bottom:6px;">💬</div>
+            やり取りを<br>重ねる
+          </div>
+          <div style="color:#1da1f2;font-size:1.2rem;">→</div>
+          <div style="background:rgba(104,211,145,0.08);border:1px solid rgba(104,211,145,0.3);border-radius:10px;padding:12px 14px;font-size:0.8rem;color:#9ae6b4;text-align:center;min-width:110px;">
+            <div style="font-size:1.3rem;margin-bottom:6px;">✅</div>
+            「これだ」と<br>思う組み合わせ
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bubble-box">
+      「どの見出しの組み合わせがいいか」は、記事を何回か書いて読者の反応を見ながら経験で分かってくる部分もあります。最初は<strong>AIに候補をたくさん出してもらい、その中から選ぶ</strong>スタイルで十分です。
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ===== Section 4 ===== -->
+  <section class="section" id="s4">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <div class="section-title-block">
+        <h2>専門知識より「量産」が大事</h2>
+        <span class="timestamp">04:30.4</span>
+      </div>
+    </div>
+
+    <p class="desc">「プレップ法」「三段論法」などの文章構成の専門知識は<strong>今は必要ありません</strong>。今のXのトレンドは、まず記事をどんどん量産すること。書きながら力をつけていくのが最短ルートです。</p>
+
+    <div class="ng-ok">
+      <div class="ng-box">
+        <div class="ng-label">❌ やらなくていいこと</div>
+        <p>専門的な文章構成の知識（プレップ法・三段論法など）を完全にマスターしてから書き始める。<br><br>→ 完璧を求めて<strong>記事を出せない</strong>状態になる。</p>
+      </div>
+      <div class="ok-box">
+        <div class="ok-label">✅ 今すぐやること</div>
+        <p>AIを使ってこの手順通りに記事を<strong>どんどん量産</strong>する。<br><br>→ 書きながら力がつき、後でリライト（書き直し）もできる。</p>
+      </div>
+    </div>
+
+    <div class="hint">
+      <span class="hint-icon">💡</span>
+      <span class="hint-text">文章力をもっと上げたい方は、別途おすすめの本などで学ぶのもOK。でも<strong>まずは出すことが最優先</strong>です。</span>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ===== Section 5 ===== -->
+  <section class="section" id="s5">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <div class="section-title-block">
+        <h2>Claudeで見出しを作成するデモ</h2>
+        <span class="timestamp">06:31.6</span>
+      </div>
+    </div>
+
+    <p class="desc">実際にClaudeを使って見出し候補を出す手順を見てみましょう。タイトル決めとは<strong>別のチャット</strong>で行うのがポイントです。</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Claudeで新しいチャットを開く</h3>
+          <p>タイトル決めとは別のチャットを使う。AIが混同しないようにするため、また説明の整理のためにも分けるのがおすすめ。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>アカウント情報を再度読み込ませる</h3>
+          <p>新しいチャットなので、GrokでまとめたXアカウント情報をもう一度貼り付ける。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>タイトルを伝えて見出し候補を出してもらう</h3>
+          <p>前回決めたタイトル案を載せて、「このタイトルに沿った見出しの候補を出してください」とシンプルに指示する。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>「見出し2つのセット」で出してもらう</h3>
+          <p>10個バラバラに出されると組み合わせに困るので、「見出しを2つにする場合のセットとして候補を提案してください」と具体的に指示する。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>気に入ったセットをベースに微調整する</h3>
+          <p>出てきたセット（A〜D）の中から方向性が合うものを選び、細かい表現は自分で修正する。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="prompt-box">
+      <span class="prompt-label">プロンプト例（ステップ3〜4）</span>
+      <div class="prompt-text"><span class="prompt-comment">// アカウント情報を貼り付けた後、こんな形で指示する</span>
+
+タイトル案：<span class="prompt-highlight">【前回決めたタイトルをここに記入】</span>
+
+このタイトルに沿った見出しの候補を出してください。
+序文と締めの文章を含めて<span class="prompt-highlight">全体で2000文字くらい</span>の記事にしようと思っています。
+<span class="prompt-highlight">見出しを2つにする場合のセット</span>として候補を提案してください。</div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <p class="desc" style="margin-bottom: 12px;">AIが出してくれる見出しセットのイメージ（A〜D形式）：</p>
+      <div class="heading-sets">
+        <div class="heading-set selected">
+          <div class="hs-label">セットA：原因究明型 <span class="hs-selected-badge">採用</span></div>
+          <div class="hs-items">
+            <div class="hs-item"><span class="hs-num">見出し①</span>3ヶ月間案件ゼロだった背景と原因</div>
+            <div class="hs-item"><span class="hs-num">見出し②</span>状況を変えるために自ら動いたこと</div>
+          </div>
+        </div>
+        <div class="heading-set">
+          <div class="hs-label">セットB：解決策提示型</div>
+          <div class="hs-items">
+            <div class="hs-item"><span class="hs-num">見出し①</span>フリーランス初期につまずく3つの理由</div>
+            <div class="hs-item"><span class="hs-num">見出し②</span>案件を取るために変えた1つのこと</div>
+          </div>
+        </div>
+        <div class="heading-set">
+          <div class="hs-label">セットC：時系列型</div>
+          <div class="hs-items">
+            <div class="hs-item"><span class="hs-num">見出し①</span>登録から3ヶ月、何が起きていたのか</div>
+            <div class="hs-item"><span class="hs-num">見出し②</span>転機となった行動と結果</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hint">
+      <span class="hint-icon">💡</span>
+      <span class="hint-text">AIが出した見出しは<strong>事実と違う表現が含まれることがある</strong>ので、自分の実体験と照らし合わせて必ず確認・修正しましょう。（例：「2ヶ月」→「3ヶ月」など）</span>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ===== Section 6 ===== -->
+  <section class="section" id="s6">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <div class="section-title-block">
+        <h2>精度を上げるための具体情報の伝え方</h2>
+        <span class="timestamp">10:27.5</span>
+      </div>
+    </div>
+
+    <p class="desc">AIが出す見出しの精度をさらに上げたいときは、<strong>自分の実体験を具体的に伝える</strong>のが効果的です。「何を変えたことで状況が変わったか」など、リアルな情報を追加しましょう。</p>
+
+    <div class="chat-demo">
+      <div class="chat-label">具体情報を追加してやり取りするイメージ</div>
+      <div class="chat-row">
+        <div class="chat-avatar avatar-user">私</div>
+        <div class="chat-bubble bubble-user">セットAの方向性でいきたいです。実際に変えたことは「毎日時間を決めてアップワークにログインし、案件を見て応募すること」でした。記事では「たった1つのこと」として伝えたいのですが、どう書けばいいか相談したいです。</div>
+      </div>
+      <div class="chat-row ai">
+        <div class="chat-avatar avatar-ai">AI</div>
+        <div class="chat-bubble bubble-ai">ありがとうございます。「1つのこと」として伝える切り口を2つ提案します。<br><br>【切り口1】継続の仕組み化として伝える<br>「毎日ログインするルールを作った」という習慣化の話として展開する。<br><br>【切り口2】行動量の変化として伝える<br>「応募数がゼロから〇件に増えた」という数字で変化を見せる。</div>
+      </div>
+      <div class="chat-row">
+        <div class="chat-avatar avatar-user">私</div>
+        <div class="chat-bubble bubble-user">切り口1でいきます。見出し②を「案件獲得ゼロを変えるために自ら動いたこと」に修正してください。</div>
+      </div>
+      <div class="chat-row ai">
+        <div class="chat-avatar avatar-ai">AI</div>
+        <div class="chat-bubble bubble-ai">承知しました。確定した見出しはこちらです。<br><br>見出し①：招待待ちの落とし穴〜なぜそれだけでは取れないのか<br>見出し②：案件獲得ゼロを変えるために自ら動いたこと</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <span class="info-box-icon">ℹ️</span>
+      <span class="info-box-text">具体的な情報を伝えるほど、AIは自分のアカウントや体験に合った見出しを提案してくれます。「実際に何が起きたか」「何を変えたか」など、リアルな情報を惜しまず伝えましょう。</span>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ===== Section 7 ===== -->
+  <section class="section" id="s7">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <div class="section-title-block">
+        <h2>見出し決めのまとめとAI活用のコツ</h2>
+        <span class="timestamp">12:40.7</span>
+      </div>
+    </div>
+
+    <p class="desc">ここまでの内容を整理します。慣れてくると2〜3回のやり取りで見出しが決まるようになります。</p>
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <h3>📋 基本の手順</h3>
+        <ul>
+          <li>タイトルとは別チャットで開始</li>
+          <li>アカウント情報を再度読み込ませる</li>
+          <li>「2つセット」で候補を出してもらう</li>
+          <li>気に入ったものを微調整して確定</li>
+        </ul>
+      </div>
+      <div class="summary-card">
+        <h3>🎯 精度を上げるコツ</h3>
+        <ul>
+          <li>自分の実体験を具体的に伝える</li>
+          <li>「どう伝えたいか」を相談する</li>
+          <li>数字・期間は必ず自分で確認・修正</li>
+        </ul>
+      </div>
+      <div class="summary-card">
+        <h3>💡 困ったときの技</h3>
+        <ul>
+          <li>他の人の記事の構成をAIに読み込ませる</li>
+          <li>「同じような構成で書きたい」と指示する</li>
+          <li>内容のコピーはNG、構造の参考はOK</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;background:linear-gradient(135deg,#1a1a2e,#1e2035);border-color:rgba(29,161,242,0.3);">
+      <div style="text-align:center;padding:8px 0;">
+        <div style="font-size:0.78rem;color:#718096;margin-bottom:12px;">第2回のまとめ</div>
+        <div style="font-size:1.05rem;font-weight:800;color:#ffffff;line-height:1.7;">
+          見出しは「タイトルの細分化」。<br>
+          <span style="color:#1da1f2;">セット形式で出してもらい → 選んで → 具体情報で磨く</span><br>
+          これだけで見出しは決まる！
+        </div>
+        <div style="margin-top:16px;font-size:0.8rem;color:#718096;">次回は「本文の下書き作成」を解説します。</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== フッター ===== -->
+<footer>
+  <p>X記事作成手順シリーズ 全6回 ／ 第2回「見出しの決め方」</p>
+  <p style="margin-top:6px;">このガイドは動画の内容を元に図解したものです。</p>
+</footer>
+
+<script>
+function jumpToSection(id) {
+  var el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+</script>
+
+</body>
+</html>
